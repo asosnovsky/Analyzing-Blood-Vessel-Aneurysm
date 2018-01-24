@@ -14,6 +14,10 @@ POINTS_FILE = './data/02_points/%s.csv'
 ## Step 03
 LINES_FILE = './data/03_lines.csv'
 
+## Step 04
+CENTROIDS_FILE = './data/04_upper_centroids.csv'
+
+
 # Constants
 EPSLION = 1E-4
 

@@ -1,9 +1,12 @@
+"""
+    This file is where the final algo will take place
+    At the moment, I only look at the values that are above a given quantile
+    Ideally, we would want to run a more robust model
+"""
+
 # Libraries
-from base import LINES_FILE, delete_if_exists, Logger, plot3d
+from base import LINES_FILE, CENTROIDS_FILE, delete_if_exists, Logger, plot3d
 from numpy import array, float, ndarray
-# from numpy import transpose as t, ones, identity
-# from numpy import argmin, argmax, amin
-# from numpy import where, delete
 from tqdm import tqdm
 from pandas import read_csv, DataFrame
 
@@ -19,9 +22,14 @@ lines_data:DataFrame = read_csv(LINES_FILE)
 
 sorted_data:DataFrame = lines_data[['center_x','center_y','center_z','distance']].sort_values(['distance'])
 
-low_end = sorted_data['distance'].quantile(0.75)
+low_end = sorted_data['distance'].quantile(0.9)
 filtered_data:DataFrame = sorted_data[ sorted_data['distance'] > low_end ]
 
+
+# Save
+filtered_data[['center_x','center_y','center_z']].to_csv(CENTROIDS_FILE)
+
+# Plot
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
