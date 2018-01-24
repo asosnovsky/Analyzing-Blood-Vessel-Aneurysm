@@ -1,0 +1,7 @@
+data/*
+**.Rproj**
+**.ipynb_checkpoints**
+**.Rhistory**
+*.csv
+**__pycache__**
+*.log
