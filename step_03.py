@@ -14,6 +14,11 @@ from pandas import read_csv, DataFrame
 logger = Logger('step_03.log')
 
 # some methods
+def unit_vector(vector: ndarray) -> ndarray:
+    """ Returns the unit vector of the vector.  """
+    from numpy import linalg
+    return vector / linalg.norm(vector)
+
 class Center:
     def __init__(self, point):
         self.x = point[0]
@@ -104,7 +109,7 @@ delete_if_exists(LINES_FILE)
 line_file = open(LINES_FILE, 'a')
 
 # Write headers
-line_file.writelines('line_idx,v1_triangle_idx,v2_triangle_idx,distance,norm_x,norm_y,norm_z,v1_x,v1_y,v1_z,v2_x,v2_y,v2_z\n')
+line_file.writelines('line_idx,v1_triangle_idx,v2_triangle_idx,distance,norm_x,norm_y,norm_z,center_x,center_y,center_z,v1_x,v1_y,v1_z,v2_x,v2_y,v2_z\n')
 
 # Function for processing one file
 def process_file(file_name: str):
@@ -148,7 +153,12 @@ def process_file(file_name: str):
                     line_idx,
                     v1_triangle_idx, v2_triangle_idx,
                     distance                    
-                ] + cross(v1, v2).tolist() + v1.tolist() + v2.tolist())) + '\n')
+                ] + 
+                unit_vector(cross(v1, v2)).tolist() + 
+                ( (v1+v2)/2 ).tolist() +
+                v1.tolist() + 
+                v2.tolist()
+            )) + '\n')
             saved += [line_idx, minimas[line_idx]]
         line_idx+=1
 
