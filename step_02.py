@@ -71,6 +71,6 @@ with tqdm(total=max_idx) as pbar:
     while len(ignore_list) < max_idx and idx < max_idx:
         ignore_list, _ = find_parrellel_line(idx, ignore_list)
         logger.log('{}> {}/{}'.format(idx, len(ignore_list), max_idx))
-        pbar.update(len(ignore_list))
+        pbar.update(len(ignore_list)-pbar.n)
         idx+=1
 
