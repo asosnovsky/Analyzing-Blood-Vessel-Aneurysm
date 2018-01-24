@@ -1,4 +1,6 @@
-data/*
+data/**/*.csv
+data/**/*.zip
+data/**/*.stl
 **.Rproj**
 **.ipynb_checkpoints**
 **.Rhistory**
