@@ -60,6 +60,8 @@ def plot3d(xs:list, ys:list, zs:list):
 class Logger:
     def __init__(self, file_name:str):
         delete_if_exists(file_name)
-        self.__file = open(file_name, 'a')
+        self.__file_name = file_name
     def log(self, message:str):
-        self.__file.writelines(message + '\n')
+        f = open(self.__file_name, 'a')
+        f.writelines(message + '\n')
+        f.close()

@@ -4,6 +4,9 @@ import base
 from numpy import ndarray, array, float, linalg, clip, dot, arccos, pi, abs, concatenate
 from tqdm import tqdm
 
+# logger
+logger = base.Logger('step_2.log')
+
 # General Methods
 def unit_vector(vector: ndarray):
     """ Returns the unit vector of the vector.  """
@@ -67,6 +70,7 @@ with tqdm(total=max_idx) as pbar:
     idx = 2
     while len(ignore_list) < max_idx and idx < max_idx:
         ignore_list, _ = find_parrellel_line(idx, ignore_list)
+        logger.log('{}> {}/{}'.format(idx, len(ignore_list), max_idx))
         pbar.update(len(ignore_list))
         idx+=1
 

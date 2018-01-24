@@ -54,21 +54,20 @@ def get_lowest_idicies(m:ndarray) -> list:
 
 # Grouping Algo
 def algo_when_odd_minimas(minimas:list) -> list:
-    # processed = []
-    # idx = 0
-    # kept = []
-    # while idx <= len(minimas) & processed <= len(minimas):
-    #     if idx not in processed:
-    #         if minimas[idx] == idx:
-    #             kept += [idx]
-    #             kept += [minimas[idx]]
-    #             processed += [minimas[idx]]
-    #         processed += [idx]
-    #     idx+=1
-    # return(kept)
-    raise Exception("Odd number of minimas")
+    processed = []
+    idx = 0
+    minimas_cp = minimas.copy()
+    while idx < len(minimas) and len(processed) < len(minimas):
+        if idx not in processed:
+            if minimas[minimas[idx]] == idx:            
+                processed += [minimas[idx]]
+            else:
+                minimas_cp[idx] = idx
+            processed += [idx]
+        idx+=1
+    return(minimas_cp)
 
-def algo_when_even_but_few(distances:ndarray, minimas:list) -> list:
+def algo_when_even(distances:ndarray, minimas:list) -> list:
     arr_minimas = array(minimas)
     processed = []
     for minima in set(minimas):
@@ -91,7 +90,7 @@ def algo_main_func(distances:ndarray) -> list:
     set_minimas = set(minimas)
     if len(set_minimas) < len(minimas):
         if len(minimas) % 2 == 0:
-            return(algo_when_even_but_few(distances.copy(), minimas))
+            return(algo_when_even(distances.copy(), minimas))
         else:
             algo_when_odd_minimas(minimas)
     return(minimas)
@@ -113,6 +112,10 @@ def process_file(file_name: str):
     # read file
     points = read_csv(POINTS_DIR + file_name)
     
+    # ignore empty files
+    if len(points) == 0:
+        return(0)
+
     logger.log('Calculating distances...')
     # Calculate Distances and clean them
     dists = calc_distances(
@@ -150,6 +153,6 @@ def process_file(file_name: str):
         line_idx+=1
 
 # main loop
-# for file_name in tqdm(file_names):
-#     process_file(file_name)
-process_file('464.csv')
+for file_name in tqdm(file_names):
+    process_file(file_name)
+# process_file('45.csv')
