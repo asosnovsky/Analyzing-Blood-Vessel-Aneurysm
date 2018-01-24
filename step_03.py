@@ -3,7 +3,7 @@
 from base import POINTS_DIR, LINES_FILE, delete_if_exists, Logger
 from numpy import array, float, ndarray
 from numpy import transpose as t, ones, identity
-from numpy import argmin, argmax, amin
+from numpy import argmin, argmax, amin, cross
 from numpy import where, delete
 from math import inf
 from tqdm import tqdm
@@ -104,7 +104,7 @@ delete_if_exists(LINES_FILE)
 line_file = open(LINES_FILE, 'a')
 
 # Write headers
-line_file.writelines('line_idx,v1_triangle_idx,v2_triangle_idx,distance,v1_x,v1_y,v1_z,v2_x,v2_y,v2_z\n')
+line_file.writelines('line_idx,v1_triangle_idx,v2_triangle_idx,distance,norm_x,norm_y,norm_z,v1_x,v1_y,v1_z,v2_x,v2_y,v2_z\n')
 
 # Function for processing one file
 def process_file(file_name: str):
@@ -147,8 +147,8 @@ def process_file(file_name: str):
                 line_file.writelines(",".join(map(str,[
                     line_idx,
                     v1_triangle_idx, v2_triangle_idx,
-                    distance
-                ] + v1.tolist() + v2.tolist())) + '\n')
+                    distance                    
+                ] + cross(v1, v2).tolist() + v1.tolist() + v2.tolist())) + '\n')
             saved += [line_idx, minimas[line_idx]]
         line_idx+=1
 
