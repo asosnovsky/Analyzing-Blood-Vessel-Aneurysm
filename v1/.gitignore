@@ -1,0 +1,9 @@
+data/**/*.csv
+data/**/*.zip
+data/**/*.stl
+**.Rproj**
+**.ipynb_checkpoints**
+**.Rhistory**
+*.csv
+**__pycache__**
+*.log

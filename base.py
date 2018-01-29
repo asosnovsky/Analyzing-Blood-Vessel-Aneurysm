@@ -1,32 +1,26 @@
 
-# Files 
+# Files
 
-## Input
-RAW_DATA = './data/00_vessel.stl'
+## Step 00
+S0_VESSELS_FILE = './data/00_vessel.stl'
 
 ## Step 01
-TRIANGLE_PROPS = './data/01_triangles.csv'
+S1_CENTERS_FILE = './data/01_centers.csv'
 
 ## Step 02
-POINTS_DIR = './data/02_points/'
-POINTS_FILE = './data/02_points/%s.csv'
+S2_SUB_GROUPS_FOLDER = './data/02_sub_groups/'
 
 ## Step 03
-LINES_FILE = './data/03_lines.csv'
-
-## Step 04
-CENTROIDS_FILE = './data/04_upper_centroids.csv'
-
+S3_SUB_GROUPS_LINES_FOLDER = './data/03_lines/'
 
 # Constants
 EPSLION = 1E-4
 
-
-# Utils
-def delete_if_exists(filename: str):
-    import os
+# Methods - system
+def delete_file_if_exists(filename: str):
+    from os import remove
     try:
-        os.remove(filename)
+        remove(filename)
     except OSError:
         pass
 
@@ -37,35 +31,45 @@ def create_clean_folder(foldername: str):
         rmtree(foldername)
     makedirs(foldername)
 
-def get_line_in_file(filename: str, line_idx:int) -> str:
-    with open(filename, 'r') as f:
-        for i, line in enumerate(f):
-            if i == line_idx:
-                return line
+class FileSaver:
+    def __init__(self, file_name:str):
+        delete_file_if_exists(file_name)
+        self.__file_name = file_name
+    def write(self, message:str, ext:str='\n'):
+        f = open(self.__file_name, 'a')
+        f.writelines(message + ext)
+        f.close()
 
-from numpy import ndarray, ones
-def remove_from_ndarray(arr:ndarray, idx:int) -> ndarray:
-    mask = ones(len(arr))
-    mask[idx] = 0
-    return(arr[mask==1])
-
+# Methods - Plot
 def plot3d(xs:list, ys:list, zs:list):
     from mpl_toolkits.mplot3d import Axes3D
-    import matplotlib.pyplot as plt
-    import numpy as np
+    from matplotlib.pyplot import figure, show
 
-    fig = plt.figure()
+    fig = figure()
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter( xs, ys, zs )
-    print()
-    print([xs, ys, zs])
-    plt.show()
+    show()
 
-class Logger:
-    def __init__(self, file_name:str):
-        delete_if_exists(file_name)
-        self.__file_name = file_name
-    def log(self, message:str):
-        f = open(self.__file_name, 'a')
-        f.writelines(message + '\n')
-        f.close()
+
+# Methods - Calc
+from numpy import ndarray
+
+def unit_vector(vector: ndarray) -> ndarray:
+    """ Returns the unit vector of the vector.  """
+    from numpy.linalg import norm
+    return vector / norm(vector)
+
+def angle_between(v1:ndarray, v2:ndarray) -> float:
+    """ Returns the angle in radians between vectors 'v1' and 'v2'::
+    """
+    from numpy import arccos, clip, dot
+    v1_u = unit_vector(v1)
+    v2_u = unit_vector(v2)
+    return arccos(clip(dot(v1_u, v2_u), -1.0, 1.0))
+
+def is_parrelel(a:ndarray, b:ndarray, epsilon:float = EPSLION) -> (bool, float):
+    """Determines if two lines are parrlel, return bool, and angle
+    """
+    from numpy import pi, abs
+    theta = angle_between(a,b)
+    return (theta < epsilon) or (abs(theta - pi) < epsilon), theta
