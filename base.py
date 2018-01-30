@@ -12,7 +12,7 @@ S2_CLUSTERS_FILE = './data/02_centers_and_clusters.csv'
 S2_CLUSTER_ALGO_FILE = './data/02_cluster.csv'
 
 ## Step 03
-S3_SUB_GROUPS_LINES_FOLDER = './data/03_lines/'
+S3_SELECTED_CLUSTERS = './data/03_selected_centers_and_clusters.csv'
 
 # Constants
 EPSLION = 1E-4

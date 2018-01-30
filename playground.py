@@ -1,48 +1,26 @@
 # Library
-from base import S1_CENTERS_FILE
+from base import S2_CLUSTERS_FILE, S2_CLUSTER_ALGO_FILE, S3_SELECTED_CLUSTERS
 from pandas import read_csv, DataFrame
+from numpy import array, percentile
 from tqdm import tqdm
 
-pbar = tqdm(total=8)
-
-# Constants
-MS_BANDWIDTH = 2.942783814571208
+# ARBITRARY CONSTANTS 
+# need more work to figure optimal points, 
+# at the moment these are manually set
 MAX_DISTANCE_QUANTILE = 85
 
+# Start Loading Bar
+pbar = tqdm(total=5)
+
 # Read Data
-triangles:DataFrame = read_csv(S1_CENTERS_FILE)
+centers_and_clusters:DataFrame = read_csv(S2_CLUSTERS_FILE)
+cluster_labels:DataFrame = read_csv(S2_CLUSTER_ALGO_FILE)
 pbar.update()
-
-# #############################################################################
-# Algo
-# #############################################################################
-from sklearn.cluster import MeanShift, estimate_bandwidth
-from numpy import percentile, array
-from pandas import DataFrame, Series
-
-# Get Just the centers
-triangle_centers = triangles[['centroid_x','centroid_y','centroid_z']].as_matrix()
-
-# clustering with MeanShift
-ms = MeanShift(bandwidth=MS_BANDWIDTH, bin_seeding=True)
-ms.fit(triangle_centers)
-pbar.update()
-
-# Grab Cluster Labels
-triangles['ms_middle'] = Series(ms.labels_, index=triangles.index)
-
-# Attach Cluster Centers
-centers_and_clusters = triangles.merge( 
-    DataFrame(ms.cluster_centers_, columns=['ms_x','ms_y','ms_z']), 
-    left_on='ms_middle', 
-    right_index=True 
-)
-pbar.update()
-
 
 # #############################################################################
 # Compute Distances
 # #############################################################################
+# Grab Vectors
 cx = centers_and_clusters['centroid_x']
 cy = centers_and_clusters['centroid_y']
 cz = centers_and_clusters['centroid_z']
@@ -51,30 +29,27 @@ msx = centers_and_clusters['ms_x']
 msy = centers_and_clusters['ms_y']
 msz = centers_and_clusters['ms_z']
 
-# Get Ready to plot
+pbar.update()
+
+# Calculate
 distances = DataFrame({
     'ms_dist': (((cx-msx)**2) + ((cy-msy)**2)  + ((cz-msz)**2))**0.5,
-    'ms_middle': centers_and_clusters['ms_middle']
+    'ms_label': centers_and_clusters['ms_label']
 })
-size = distances.groupby(['ms_middle'])['ms_dist'].max()
+size = distances.groupby(['ms_label'])['ms_dist'].max()
 pbar.update()
-
-colors = array(['blue'] * len(size))
-colors[size > percentile(size, q = MAX_DISTANCE_QUANTILE)] = 'red'
-
-size = 1000*size/max(size)
-pbar.update()
-
 
 # #############################################################################
-# Plot
+# Calculate Sub Groups
 # #############################################################################
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib.pyplot import figure, show
+chosen_groups = cluster_labels['ms_label'][size > percentile(size, q = MAX_DISTANCE_QUANTILE)].tolist()
 
-fig = figure()
-ax = fig.add_subplot(111, projection='3d')
-ax.scatter( ms.cluster_centers_[:,0], ms.cluster_centers_[:,1], ms.cluster_centers_[:,2], s=size, c=colors )
+chosen_groups = [11,24,15]
+chosen_centers_and_clusters = centers_and_clusters.loc[[ j in chosen_groups for j in centers_and_clusters['ms_label'] ]]
 pbar.update()
 
-show()
+# #############################################################################
+# Save
+# #############################################################################
+chosen_centers_and_clusters.to_csv(S3_SELECTED_CLUSTERS, index=False)
+pbar.update()

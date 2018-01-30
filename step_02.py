@@ -6,8 +6,7 @@ from tqdm import tqdm
 # ARBITRARY CONSTANTS 
 # need more work to figure optimal points, 
 # at the moment these are manually set
-MS_BANDWIDTH = 2.942783814571208
-MAX_DISTANCE_QUANTILE = 85
+MS_BANDWIDTH = 3.2
 
 # Start Loading Bar
 pbar = tqdm(total=5)
@@ -37,7 +36,8 @@ triangles['ms_label'] = Series(ms.labels_, index=triangles.index)
 pbar.update()
 
 # Attach Cluster Centers
-centers_and_clusters = triangles.merge( 
+centers_and_clusters = merge(
+    triangles, 
     DataFrame(ms.cluster_centers_, columns=['ms_x','ms_y','ms_z']), 
     left_on='ms_label', 
     right_index=True 
@@ -45,7 +45,7 @@ centers_and_clusters = triangles.merge(
 
 # Save
 merge(
-    DataFrame(ms.labels_, columns=['ms_label']),
+    DataFrame([i for i in range(0,len(ms.cluster_centers_))], columns=['ms_label']),
     DataFrame(ms.cluster_centers_, columns=['x','y','z']),
     left_index=True, right_index=True
 ).to_csv(S2_CLUSTER_ALGO_FILE, index=False)

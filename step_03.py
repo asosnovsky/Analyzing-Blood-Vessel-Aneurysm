@@ -1,74 +1,55 @@
 # Library
-from base import S2_SUB_GROUPS_FOLDER, S3_SUB_GROUPS_LINES_FOLDER, FileSaver, create_clean_folder, is_parrelel
-from numpy import array, ndarray
+from base import S2_CLUSTERS_FILE, S2_CLUSTER_ALGO_FILE, S3_SELECTED_CLUSTERS
 from pandas import read_csv, DataFrame
+from numpy import array, percentile
 from tqdm import tqdm
-from os import listdir
-from multiprocessing.dummy import Pool as ThreadPool 
-from re import sub as strsub
 
-# Read Files
-groupings_files = listdir(S2_SUB_GROUPS_FOLDER)
+# ARBITRARY CONSTANTS 
+# need more work to figure optimal points, 
+# at the moment these are manually set
+MAX_DISTANCE_QUANTILE = 85
 
-# Methods
-def grab_norm(dt:DataFrame, idx:int) -> ndarray:
-    return(array([
-        dt.loc[idx]['norm_x'],
-        dt.loc[idx]['norm_y'],
-        dt.loc[idx]['norm_z'],
-    ]))
-
-def find_all_parrellels(dt:DataFrame, idx: int) -> DataFrame:
-    parrellels = {
-        'triangle_idx': [],
-        'theta': [],
-    }
-    min_theta = 1000000
-    my_norm = grab_norm(dt, idx)
-
-    def run_once(i: int):
-        if i != idx:
-            their_norm = grab_norm(dt, i)
-            isparrellel, theta = is_parrelel(my_norm, their_norm, epsilon=0.01)
-            if isparrellel:
-                parrellels['triangle_idx'] += [int(dt.loc[i]['triangle_idx'])]
-                parrellels['theta'] += [theta]
-
-    pool = ThreadPool(4) 
-    results = pool.map(run_once, range(0, len(dt)-1))
-    if len(parrellels['theta']) > 0:
-        parrellels['target_idx'] = [idx]*len(parrellels['theta'])
-        return DataFrame(parrellels)
-    else:
-        return None
-            
-
-# Reset main save folder
-create_clean_folder(S3_SUB_GROUPS_LINES_FOLDER)
-
-
-grouping_file:str = groupings_files[1]
-
-# Create Save Folder
-SAVE_FOLDER = S3_SUB_GROUPS_LINES_FOLDER + strsub('\.csv$', '', grouping_file) + '/'
-create_clean_folder(SAVE_FOLDER)
+# Start Loading Bar
+pbar = tqdm(total=5)
 
 # Read Data
-centers:DataFrame = read_csv(S2_SUB_GROUPS_FOLDER + grouping_file)
+centers_and_clusters:DataFrame = read_csv(S2_CLUSTERS_FILE)
+cluster_labels:DataFrame = read_csv(S2_CLUSTER_ALGO_FILE)
+pbar.update()
 
-# Run Loop
-processed = []
-idx = 0
-pbar = tqdm(total=len(centers))
-while idx < len(centers) and len(processed) < len(centers):
-    if idx not in processed:
-        processed += [idx]
-        abs_parrellel = find_all_parrellels(centers, idx)
-        if abs_parrellel is not None:
-            abs_parrellel.to_csv(SAVE_FOLDER + str(idx) + '.csv', index=False)
-            processed += abs_parrellel['target_idx'].as_matrix().tolist()
+# #############################################################################
+# Compute Distances
+# #############################################################################
+# Grab Vectors
+cx = centers_and_clusters['centroid_x']
+cy = centers_and_clusters['centroid_y']
+cz = centers_and_clusters['centroid_z']
 
-    pbar.update(len(processed)-pbar.n)
-    idx+=1
+msx = centers_and_clusters['ms_x']
+msy = centers_and_clusters['ms_y']
+msz = centers_and_clusters['ms_z']
 
+pbar.update()
 
+# Calculate
+distances = DataFrame({
+    'ms_dist': (((cx-msx)**2) + ((cy-msy)**2)  + ((cz-msz)**2))**0.5,
+    'ms_label': centers_and_clusters['ms_label']
+})
+size = distances.groupby(['ms_label'])['ms_dist'].max()
+pbar.update()
+
+# #############################################################################
+# Calculate Sub Groups
+# #############################################################################
+chosen_groups = cluster_labels['ms_label'][size > percentile(size, q = MAX_DISTANCE_QUANTILE)].tolist()
+
+chosen_groups = [11,24,15]
+chosen_centers_and_clusters = centers_and_clusters.loc[[ j in chosen_groups for j in centers_and_clusters['ms_label'] ]]
+pbar.update()
+
+# #############################################################################
+# Save
+# #############################################################################
+chosen_centers_and_clusters.to_csv(S3_SELECTED_CLUSTERS, index=False)
+pbar.update()
