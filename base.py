@@ -8,7 +8,8 @@ S0_VESSELS_FILE = './data/00_vessel.stl'
 S1_CENTERS_FILE = './data/01_centers.csv'
 
 ## Step 02
-S2_SUB_GROUPS_FOLDER = './data/02_sub_groups/'
+S2_CLUSTERS_FILE = './data/02_centers_and_clusters.csv'
+S2_CLUSTER_ALGO_FILE = './data/02_cluster.csv'
 
 ## Step 03
 S3_SUB_GROUPS_LINES_FOLDER = './data/03_lines/'
