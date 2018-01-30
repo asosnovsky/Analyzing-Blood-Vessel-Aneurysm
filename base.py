@@ -14,6 +14,9 @@ S2_CLUSTER_ALGO_FILE = './data/02_cluster.csv'
 ## Step 03
 S3_SELECTED_CLUSTERS = './data/03_selected_centers_and_clusters.csv'
 
+## Step 04
+S4_REDUCED_POINTS = './data/04_reduced_points.csv'
+
 # Constants
 EPSLION = 1E-4
 
