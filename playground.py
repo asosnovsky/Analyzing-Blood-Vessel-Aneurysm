@@ -1,5 +1,5 @@
 # Library
-from base import S2_CLUSTERS_FILE, S2_CLUSTER_ALGO_FILE
+from base import S2_CLUSTERS_FILE, S2_CLUSTER_ALGO_FILE, S3_SELECTED_CLUSTERS
 from pandas import read_csv, DataFrame
 from numpy import array, percentile
 from tqdm import tqdm
@@ -10,7 +10,7 @@ from tqdm import tqdm
 MAX_DISTANCE_QUANTILE = 80
 
 # Start Loading Bar
-pbar = tqdm(total=5)
+pbar = tqdm(total=7)
 
 # Read Data
 centers_and_clusters:DataFrame = read_csv(S2_CLUSTERS_FILE)
@@ -38,7 +38,7 @@ distances = DataFrame({
 })
 size = distances.groupby(['ms_label'])['ms_dist'].max()
 pbar.update()
-print(size)
+
 # #############################################################################
 # Cluster Outliers
 # #############################################################################
