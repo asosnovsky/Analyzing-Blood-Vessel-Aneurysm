@@ -20,6 +20,7 @@ pbar.update()
 
 # Save
 DataFrame(
-    ms.cluster_centers_
+    ms.cluster_centers_,
+    columns=['x','y','z']
 ).to_csv(S4_REDUCED_POINTS, index=False)
 pbar.update()
