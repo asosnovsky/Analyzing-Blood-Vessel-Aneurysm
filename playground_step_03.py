@@ -1,3 +1,9 @@
+# #############################################################################
+# This is just where I mess around with the script and plot
+# the results
+# #############################################################################
+
+
 # Library
 from base import S2_CLUSTERS_FILE, S2_CLUSTER_ALGO_FILE, S3_SELECTED_CLUSTERS
 from pandas import read_csv, DataFrame
@@ -10,7 +16,7 @@ from tqdm import tqdm
 MAX_DISTANCE_QUANTILE = 80
 
 # Start Loading Bar
-pbar = tqdm(total=5)
+pbar = tqdm(total=7)
 
 # Read Data
 centers_and_clusters:DataFrame = read_csv(S2_CLUSTERS_FILE)
@@ -73,11 +79,40 @@ pbar.update()
 marked_clusters = outlier_clusters.loc[ms.labels_ == top_cluster]['ms_label']
 
 # #############################################################################
-# Save
+# Plot
 # #############################################################################
-centers_and_clusters.loc[[ 
-    ms_label in marked_clusters 
-    for ms_label in centers_and_clusters['ms_label'] 
-]].to_csv(S3_SELECTED_CLUSTERS)
+# Create Color Schemes
+colors = array(['green'] * len(size))
+colors[marked_clusters] = 'red'
+
+# Size it
+size = 1000*size/max(size)
 pbar.update()
+
+# Plot
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib.pyplot import figure, show
+
+fig = figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter( 
+    cluster_labels['x'],
+    cluster_labels['y'],
+    cluster_labels['z'],
+    s=size, c=colors 
+)
+pbar.update()
+
+
+for cc_j in range(0,len(cluster_labels)):
+    ax.text( 
+        cluster_labels['x'][cc_j], 
+        cluster_labels['y'][cc_j], 
+        cluster_labels['z'][cc_j],  
+        str(cc_j), 
+        size=20, zorder=1, color='k'
+    ) 
+pbar.update()
+
+show()
 
