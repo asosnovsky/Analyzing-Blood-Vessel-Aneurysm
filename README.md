@@ -26,3 +26,18 @@ Then run (in order)
 The final output will be placed in `data/`. However, I have moved the final output (step_05) and the low-resolution data (for easier plotting, it is produced in step_04). Below you can see an image of the final results
 
 ![output](./Output-visualization.png)
+
+## Basic Data Documentation
+
+While running the scripts, the following files are generated under `/data`:
+
+- **00_vessel.stl**: Input file (provided by research staff)    
+- **01_vertices.csv**: Every vertex extracted from the `.stl` file
+- **01_centers.csv**: Calculated centroids of triangles found in the `stl` file
+- **02_centers_and_clusters.csv**: similar to the `01_centers` file, but with cluster labels
+- **02_cluster.csv**: centers of the clusters identified in this stage
+- **03_selected_centers_and_clusters.csv**: reduced version of `02_centers_and_clusters`
+- **04_reduced_points.csv**: a lower resolution data-set of `03_selected_centers_and_clusters`
+- **05_centers.csv**: an estimated centroid for the data in `04_reduced_points`
+
+**Note** if the columns in these files require further clarification I can provide that additional documentation.
