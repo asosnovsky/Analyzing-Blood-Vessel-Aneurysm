@@ -5,8 +5,7 @@
 S0_VESSELS_FILE = './data/00_vessel.stl'
 
 ## Step 01
-S1_CENTERS_FILE = './data/01_centers.csv'
-S1_VERTICIES_FILE = './data/01_vertices.csv'
+S1_TRIANGLES_FILE = './data/01_triangles.csv'
 
 ## Step 02
 S2_CLUSTERS_FILE = './data/02_centers_and_clusters.csv'
@@ -47,6 +46,13 @@ class FileSaver:
         f = open(self.__file_name, 'a')
         f.writelines(message + ext)
         f.close()
+        
+from subprocess import Popen , PIPE
+def sh(*args, quiet:bool=True):
+    popen = Popen(args, stdout=PIPE)
+    popen.wait()
+    if not quiet:
+        print(popen.stdout.read())
 
 # Methods - Plot
 def plot3d(xs:list, ys:list, zs:list):

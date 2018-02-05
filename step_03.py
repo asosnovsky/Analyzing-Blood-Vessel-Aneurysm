@@ -78,6 +78,6 @@ marked_clusters = outlier_clusters.loc[ms.labels_ == top_cluster]['ms_label']
 centers_and_clusters.loc[[ 
     ms_label in marked_clusters 
     for ms_label in centers_and_clusters['ms_label'] 
-]].to_csv(S3_SELECTED_CLUSTERS)
+]].to_csv(S3_SELECTED_CLUSTERS, index=False)
 pbar.update()
 

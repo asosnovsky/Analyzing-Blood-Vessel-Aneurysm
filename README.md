@@ -7,7 +7,7 @@ The process is split up into 4 steps.
 - Step 2: Use Mean Shift clustering to identify various groupings in data
 - Step 3: List groupings that contain high diameters, then select the highest diameter groupings
 - Step 4: Use mean-shift to lower the resolution of the selected grouping
-- Step 5: Attempt to generate a centroid line on the reduced resulotion grouping
+- Step 5: Attempt to generate a centroid line using a thinning algo
 
 ## How to use
 Extract `vessels.stl.zip` into `data/` as `data/00_vessel.stl`.

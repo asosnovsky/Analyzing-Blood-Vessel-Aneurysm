@@ -1,5 +1,5 @@
 # Library
-from base import S1_CENTERS_FILE, S2_CLUSTERS_FILE, S2_CLUSTER_ALGO_FILE
+from base import S1_TRIANGLES_FILE, S2_CLUSTERS_FILE, S2_CLUSTER_ALGO_FILE
 from pandas import read_csv, DataFrame
 from tqdm import tqdm
 
@@ -12,7 +12,7 @@ MS_BANDWIDTH = 3.2
 pbar = tqdm(total=5)
 
 # Read Data
-triangles:DataFrame = read_csv(S1_CENTERS_FILE)
+triangles:DataFrame = read_csv(S1_TRIANGLES_FILE)
 pbar.update()
 
 # #############################################################################
