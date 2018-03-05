@@ -7,3 +7,4 @@ data/**/*.stl
 *.csv
 **__pycache__**
 *.log
+v2
